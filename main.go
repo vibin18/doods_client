@@ -14,9 +14,9 @@ import (
 
 type opts struct {
 	File          string `short:"f"  long:"file"      env:"FILE"  description:"Filename for detecting" default:"vibin3.jpg"`
-	DiscordToken  string `short:"t"  long:"token"      env:"DISCORD_TOKEN"  description:"Discord Webhook token"`
-	WebhookId     string `short:"h"  long:"webhook"      env:"DISCORD_WEBHOOK_ID"  description:"Discord Webhook ID"`
-	MinConfidence string `short:"m"  long:"mincon"      env:"MINIMUM_CONFIDENCE"  description:"Minimum confidence level" default:"50"`
+	DiscordToken  string `           long:"token"      env:"DISCORD_TOKEN"  description:"Discord Webhook token"`
+	WebhookId     string `           long:"webhook"      env:"DISCORD_WEBHOOK_ID"  description:"Discord Webhook ID"`
+	MinConfidence string `           long:"mincon"      env:"MINIMUM_CONFIDENCE"  description:"Minimum confidence level" default:"50"`
 }
 
 var (
@@ -114,6 +114,6 @@ func main() {
 	}
 
 	id := NotifyDiscord(webhook, arg.DiscordToken, reader1, "alert.jpg", ConfidenceMapList)
-	fmt.Println("Message send with id " + id)
+	fmt.Println(id)
 
 }

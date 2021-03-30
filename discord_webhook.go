@@ -51,28 +51,31 @@ func NotifyDiscord(webhook snowflake.Snowflake, token string, imagefile io.Reade
 	desc := outFormat(confidence_list)
 
 	hook := NewHookMatter()
-	hook.SetHookMatterTitle("Objects with highest probability found. ")
+	hook.SetHookMatterTitle(fmt.Sprintf("Objects with minimum %s %% probability found.", arg.MinConfidence))
 	hook.SetHookMatterDescription(fmt.Sprintln(desc))
 	hook.SetHookMatterImageFile(imagefile)
 	hook.SetHookMatterImageName(imagename)
 
-	wa, err := discordhook.NewWebhookAPI(webhook, token, true, nil)
-	if err != nil {
-		panic(err)
-	}
+	if len(confidence_list) != 0 {
+		wa, err := discordhook.NewWebhookAPI(webhook, token, true, nil)
+		if err != nil {
+			panic(err)
+		}
 
-	msg, err := wa.Execute(nil, &discordhook.WebhookExecuteParams{
-		Content: "A.I Detected a motion",
+		msg, err := wa.Execute(nil, &discordhook.WebhookExecuteParams{
+			Content: "A.I Detected a motion",
 
-		Embeds: []*discordhook.Embed{
-			{
-				Title:       hook.Embeditem.Title,
-				Description: hook.Embeditem.Description,
+			Embeds: []*discordhook.Embed{
+				{
+					Title:       hook.Embeditem.Title,
+					Description: hook.Embeditem.Description,
+				},
 			},
-		},
-	}, hook.ImageFile, hook.ImageName)
-	if err != nil {
-		panic(err)
+		}, hook.ImageFile, hook.ImageName)
+		if err != nil {
+			panic(err)
+		}
+		return fmt.Sprintln(msg.ID)
 	}
-	return fmt.Sprintln(msg.ID)
+	return "No object with minimum probability found"
 }
