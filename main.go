@@ -24,11 +24,35 @@ var (
 	arg       opts
 )
 
+//type RequestData struct {
+//	Data         string `json:"data"`
+//	DetectorName string `json:"detector_name"`
+//	Detect       struct {
+//		Person int64 `json:"*"`
+//	} `json:"detect"`
+//}
+
+
 type RequestData struct {
-	Data         string `json:"data"`
 	DetectorName string `json:"detector_name"`
+	Data         string `json:"data"`
+	File         string `json:"file"`
 	Detect       struct {
-		Person int64 `json:"*"`
+		Person     int64 `json:"person"`
+		Cat        int64 `json:"cat"`
+		Bicycle    int64 `json:"bicycle"`
+		Car        int64 `json:"car"`
+		Motorcycle int64 `json:"motorcycle"`
+		Truck      int64 `json:"truck"`
+		Bird       int64 `json:"bird"`
+		Dog        int64 `json:"dog"`
+		Horse      int64 `json:"horse"`
+		Sheep      int64 `json:"sheep"`
+		cow        int64 `json:"cow"`
+		elephant   int64 `json:"elephant"`
+		bear       int64 `json:"bear"`
+		umbrella   int64 `json:"umbrella"`
+		handbag    int64 `json:"handbag"`
 	} `json:"detect"`
 }
 
@@ -51,6 +75,20 @@ func NewRequestData() *RequestData {
 
 func (c *RequestData) SetdetectOption(val int64) {
 	c.Detect.Person = val
+	c.Detect.Cat = val
+	c.Detect.Bicycle = val
+	c.Detect.Car = val
+	c.Detect.Motorcycle = val
+	c.Detect.Truck = val
+	c.Detect.Bird = val
+	c.Detect.Dog = val
+	c.Detect.Horse = val
+	c.Detect.Sheep = val
+	c.Detect.cow = val
+	c.Detect.elephant = val
+	c.Detect.bear = val
+	c.Detect.umbrella = val
+	c.Detect.handbag = val
 }
 
 func (c *RequestData) Setdetector_name(val string) {
