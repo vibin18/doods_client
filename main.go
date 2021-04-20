@@ -24,15 +24,6 @@ var (
 	arg       opts
 )
 
-//type RequestData struct {
-//	Data         string `json:"data"`
-//	DetectorName string `json:"detector_name"`
-//	Detect       struct {
-//		Person int64 `json:"*"`
-//	} `json:"detect"`
-//}
-
-
 type RequestData struct {
 	DetectorName string `json:"detector_name"`
 	Data         string `json:"data"`
@@ -83,7 +74,6 @@ func (c *RequestData) SetdetectOption(val int64) {
 	c.Detect.Bird = val
 	c.Detect.Dog = val
 	c.Detect.Horse = val
-	c.Detect.Sheep = val
 	c.Detect.cow = val
 	c.Detect.elephant = val
 	c.Detect.bear = val
@@ -121,6 +111,8 @@ func initArgparser() {
 
 func main() {
 	initArgparser()
+
+
 	uint_webhook, _ := strconv.ParseUint(arg.WebhookId, 10, 64)
 	webhook := snowflake.Snowflake(uint_webhook)
 	int_confidence, _ := strconv.ParseFloat(arg.MinConfidence, 10)
@@ -155,3 +147,4 @@ func main() {
 	fmt.Println(id)
 
 }
+
