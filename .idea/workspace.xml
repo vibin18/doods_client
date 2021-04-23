@@ -118,7 +118,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/main.go</url>
-          <line>110</line>
+          <line>109</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>

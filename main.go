@@ -38,7 +38,6 @@ type RequestData struct {
 		Bird       int64 `json:"bird"`
 		Dog        int64 `json:"dog"`
 		Horse      int64 `json:"horse"`
-		Sheep      int64 `json:"sheep"`
 		cow        int64 `json:"cow"`
 		elephant   int64 `json:"elephant"`
 		bear       int64 `json:"bear"`
