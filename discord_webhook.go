@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/andersfylling/snowflake"
 	"github.com/nickname32/discordhook"
@@ -46,14 +47,14 @@ func outFormat(clist []map[string]float64) string {
 	return ret_string
 }
 
-func NotifyDiscord(webhook snowflake.Snowflake, token string, imagefile io.Reader, imagename string, confidence_list []map[string]float64) string {
+func NotifyDiscord(webhook snowflake.Snowflake, token string, imagefile []byte, imagename string, confidence_list []map[string]float64) string {
 
 	desc := outFormat(confidence_list)
-
+	imagefileIO :=bytes.NewReader(imagefile)
 	hook := NewHookMatter()
 	hook.SetHookMatterTitle(fmt.Sprintf("Objects with minimum %s %% probability found.", arg.MinConfidence))
 	hook.SetHookMatterDescription(fmt.Sprintln(desc))
-	hook.SetHookMatterImageFile(imagefile)
+	hook.SetHookMatterImageFile(imagefileIO)
 	hook.SetHookMatterImageName(imagename)
 
 	if len(confidence_list) != 0 {

@@ -3,17 +3,16 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 //func DetectImage(imageFile string, minProb int64, wg *sync.WaitGroup) (error, ResponseData ) {
-func DetectImage(imageFile io.Reader, minProb int64) (error, ResponseData) {
+func DetectImage(imageFile []byte, minProb int64) (error, ResponseData) {
 	var ret ResponseData
 	con := NewRequestData()
-	con.Setdata(imageFile)
+	con.SetFiledata(imageFile)
 	con.Setdetector_name("default")
 	con.SetdetectOption(minProb)
 

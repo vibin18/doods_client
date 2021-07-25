@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/andersfylling/snowflake"
 	"github.com/jessevdk/go-flags"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -84,11 +83,9 @@ func (c *RequestData) Setdetector_name(val string) {
 	c.DetectorName = val
 }
 
-func (c *RequestData) Setdata(val io.Reader) error {
-	content, _ := ioutil.ReadAll(val)
-	encoded := base64.StdEncoding.EncodeToString(content)
+func (c *RequestData) SetFiledata(val []byte)  {
+	encoded := base64.StdEncoding.EncodeToString(val)
 	c.Data = encoded
-	return nil
 }
 
 func initArgparser() {
@@ -122,16 +119,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	f, _ := os.Open(arg.File)
-	reader := io.Reader(f)
+	byteImage, err := ioutil.ReadFile("1.jpg") // just pass the file name
+	if err != nil {
+		fmt.Print(err)
+	}
 
-	err, result := DetectImage(reader, 40)
+
+	err, result := DetectImage(byteImage, 40)
 	if err != nil {
 		log.Fatalf("An Error Occured %v", err)
 		os.Exit(1)
 	}
-	f1, _ := os.Open(arg.File)
-	reader1 := io.Reader(f1)
+
 
 	for _, v := range result.Detections {
 		if v.Confidence >= int_confidence {
@@ -142,7 +141,7 @@ func main() {
 		}
 	}
 
-	id := NotifyDiscord(webhook, arg.DiscordToken, reader1, "alert.jpg", ConfidenceMapList)
+	id := NotifyDiscord(webhook, arg.DiscordToken, byteImage, "alert.jpg", ConfidenceMapList)
 	fmt.Println(id)
 
 }
