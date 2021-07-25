@@ -119,7 +119,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	byteImage, err := ioutil.ReadFile("1.jpg") // just pass the file name
+	byteImage, err := ioutil.ReadFile(arg.File) // just pass the file name
 	if err != nil {
 		fmt.Print(err)
 	}
