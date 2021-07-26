@@ -6,13 +6,14 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/vibin18/doods_client/webhooks"
 	"io/ioutil"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 )
 
 type opts struct {
 	File          string `short:"f"  long:"file"      env:"FILE"  description:"Filename for detecting" default:"vibin3.jpg"`
+	DoodsServer   string `           long:"server"      env:"DOODS_SERVER"  description:"Server name or IP of doods server and port number" default:"192.168.4.1:8082"`
 	DiscordToken  string `           long:"token"      env:"DISCORD_TOKEN"  description:"Discord Webhook token"`
 	WebhookId     string `           long:"webhook"      env:"DISCORD_WEBHOOK_ID"  description:"Discord Webhook ID"`
 	MinConfidence string `           long:"mincon"      env:"MINIMUM_CONFIDENCE"  description:"Minimum confidence level" default:"50"`
@@ -37,8 +38,8 @@ func initArgparser() {
 			os.Exit(1)
 		}
 	}
-
 }
+
 
 func main() {
 
@@ -50,20 +51,21 @@ func main() {
 	var ConfidenceMapList []map[string]float64
 
 	if _, err := os.Stat(arg.File); os.IsNotExist(err) {
-		fmt.Println(fmt.Sprintf("File %q NOT found!", arg.File))
-		os.Exit(1)
+		log.Infof("File %s NOT found!", arg.File)
+		log.Panic(err)
 	}
 
-	byteImage, err := ioutil.ReadFile(arg.File) // just pass the file name
+	byteImage, err := ioutil.ReadFile(arg.File)
 	if err != nil {
-		fmt.Print(err)
+		log.Infof("Byte conversion failed!")
+		log.Panic(err)
 	}
 
 
 	err, result := DetectImage(byteImage, 40)
 	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
-		os.Exit(1)
+		log.Infof("Failed to detect image")
+		log.Panic(err)
 	}
 
 
@@ -76,8 +78,6 @@ func main() {
 		}
 	}
 
-	id := webhooks.NotifyDiscord(webhook, arg.DiscordToken, byteImage, "alert.jpg", arg.MinConfidence, ConfidenceMapList)
-	fmt.Println(id)
-
+	webhooks.NotifyDiscord(webhook, arg.DiscordToken, byteImage, "alert.jpg", arg.MinConfidence, ConfidenceMapList)
 }
 

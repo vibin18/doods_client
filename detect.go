@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -87,26 +87,25 @@ func DetectImage(imageFile []byte, minProb int64) (error, ResponseData) {
 	prettyJSON, err := json.MarshalIndent(con, "", "    ")
 
 	if err != nil {
-		println(err)
+		log.Panic(err)
 	}
 
 	responseBody := bytes.NewBuffer(prettyJSON)
-	//Leverage Go's HTTP Post function to make request
-	resp, err := http.Post("http://192.168.4.1:8082/detect", "application/json", responseBody)
-	//Handle Error
+
+	resp, err := http.Post("http://" + arg.DoodsServer + "/detect", "application/json", responseBody)
 	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
+		log.Panic(err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
+		log.Panic(err)
 	}
 
 	err = json.Unmarshal(body, &ret)
 	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
+		log.Panic(err)
 	}
 
 	//wg.Done()

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/andersfylling/snowflake"
 	"github.com/nickname32/discordhook"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"strings"
 )
@@ -47,20 +48,20 @@ func outFormat(clist []map[string]float64) string {
 	return ret_string
 }
 
-func NotifyDiscord(webhookName snowflake.Snowflake, WebHookToken string, imageFile []byte, imagename string, minConfidence string, confidenceList []map[string]float64) string {
+func NotifyDiscord(webhookName snowflake.Snowflake, WebHookToken string, imageFile []byte, imagename string, minConfidence string, confidenceList []map[string]float64) {
 
 	desc := outFormat(confidenceList)
-	imagefileIO := bytes.NewReader(imageFile)
+	imageFileIO := bytes.NewReader(imageFile)
 	hook := NewHookMatter()
 	hook.SetHookMatterTitle(fmt.Sprintf("Objects with minimum %s %% probability found.", minConfidence))
 	hook.SetHookMatterDescription(fmt.Sprintln(desc))
-	hook.SetHookMatterImageFile(imagefileIO)
+	hook.SetHookMatterImageFile(imageFileIO)
 	hook.SetHookMatterImageName(imagename)
 
 	if len(confidenceList) != 0 {
 		wa, err := discordhook.NewWebhookAPI(webhookName, WebHookToken, true, nil)
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 
 		msg, err := wa.Execute(nil, &discordhook.WebhookExecuteParams{
@@ -74,9 +75,11 @@ func NotifyDiscord(webhookName snowflake.Snowflake, WebHookToken string, imageFi
 			},
 		}, hook.ImageFile, hook.ImageName)
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
-		return fmt.Sprintln(msg.ID)
+		imageId := fmt.Sprint(msg.ID)
+		log.Infof("Image id: %s with minimum %s%% probability found", imageId, minConfidence)
+	}else {
+		log.Errorf("No object with minimum %s%% probability found", minConfidence)
 	}
-	return "No object with minimum probability found"
 }
