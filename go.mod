@@ -1,4 +1,4 @@
-module doods_client
+module github.com/vibin18/doods_client
 
 go 1.15
 

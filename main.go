@@ -44,9 +44,9 @@ func main() {
 
 	initArgparser()
 
-	uint_webhook, _ := strconv.ParseUint(arg.WebhookId, 10, 64)
-	webhook := snowflake.Snowflake(uint_webhook)
-	int_confidence, _ := strconv.ParseFloat(arg.MinConfidence, 10)
+	uintWebhook, _ := strconv.ParseUint(arg.WebhookId, 10, 64)
+	webhook := snowflake.Snowflake(uintWebhook)
+	intConfidence, _ := strconv.ParseFloat(arg.MinConfidence, 10)
 	var ConfidenceMapList []map[string]float64
 
 	if _, err := os.Stat(arg.File); os.IsNotExist(err) {
@@ -68,7 +68,7 @@ func main() {
 
 
 	for _, v := range result.Detections {
-		if v.Confidence >= int_confidence {
+		if v.Confidence >= intConfidence {
 			itemMap := map[string]float64{
 				v.Label: v.Confidence,
 			}
