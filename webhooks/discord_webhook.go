@@ -1,4 +1,4 @@
-package main
+package webhooks
 
 import (
 	"bytes"
@@ -47,18 +47,18 @@ func outFormat(clist []map[string]float64) string {
 	return ret_string
 }
 
-func NotifyDiscord(webhook snowflake.Snowflake, token string, imagefile []byte, imagename string, confidence_list []map[string]float64) string {
+func NotifyDiscord(webhookName snowflake.Snowflake, WebHookToken string, imageFile []byte, imagename string, minConfidence string, confidenceList []map[string]float64) string {
 
-	desc := outFormat(confidence_list)
-	imagefileIO :=bytes.NewReader(imagefile)
+	desc := outFormat(confidenceList)
+	imagefileIO := bytes.NewReader(imageFile)
 	hook := NewHookMatter()
-	hook.SetHookMatterTitle(fmt.Sprintf("Objects with minimum %s %% probability found.", arg.MinConfidence))
+	hook.SetHookMatterTitle(fmt.Sprintf("Objects with minimum %s %% probability found.", minConfidence))
 	hook.SetHookMatterDescription(fmt.Sprintln(desc))
 	hook.SetHookMatterImageFile(imagefileIO)
 	hook.SetHookMatterImageName(imagename)
 
-	if len(confidence_list) != 0 {
-		wa, err := discordhook.NewWebhookAPI(webhook, token, true, nil)
+	if len(confidenceList) != 0 {
+		wa, err := discordhook.NewWebhookAPI(webhookName, WebHookToken, true, nil)
 		if err != nil {
 			panic(err)
 		}
