@@ -4,19 +4,18 @@ import (
 	"fmt"
 	"github.com/andersfylling/snowflake"
 	"github.com/jessevdk/go-flags"
+	log "github.com/sirupsen/logrus"
 	"github.com/vibin18/doods_client/webhooks"
 	"io/ioutil"
-	log "github.com/sirupsen/logrus"
 	"os"
-	"strconv"
 )
 
 type opts struct {
-	File          string `short:"f"  long:"file"      env:"FILE"  description:"Filename for detecting" default:"vibin3.jpg"`
-	DoodsServer   string `           long:"server"      env:"DOODS_SERVER"  description:"Server name or IP of doods server and port number" default:"192.168.4.1:8082"`
-	DiscordToken  string `           long:"token"      env:"DISCORD_TOKEN"  description:"Discord Webhook token"`
-	WebhookId     string `           long:"webhook"      env:"DISCORD_WEBHOOK_ID"  description:"Discord Webhook ID"`
-	MinConfidence string `           long:"mincon"      env:"MINIMUM_CONFIDENCE"  description:"Minimum confidence level" default:"50"`
+	File          string  `short:"f"  long:"file"      env:"FILE"  description:"Filename for detecting" default:"vibin3.jpg"`
+	DoodsServer   string  `           long:"server"      env:"DOODS_SERVER"  description:"Server name or IP of doods server and port number" default:"192.168.4.1:8082"`
+	DiscordToken  string  `           long:"token"      env:"DISCORD_TOKEN"  description:"Discord Webhook token"`
+	WebhookId     uint64  `           long:"webhook"      env:"DISCORD_WEBHOOK_ID"  description:"Discord Webhook ID"`
+	MinConfidence float64 `           long:"mincon"      env:"MINIMUM_CONFIDENCE"  description:"Minimum confidence level and Max is 100" default:"50"`
 }
 
 var (
@@ -40,37 +39,33 @@ func initArgparser() {
 	}
 }
 
-
 func main() {
 
 	initArgparser()
+	webhook := snowflake.Snowflake(arg.WebhookId)
+	minConfidence := arg.MinConfidence
+	if !(minConfidence >= 0 && minConfidence <= 100) {
+		log.Panicf("Minimum confidence should between 0-100, got %f", minConfidence)
+	}
 
-	uintWebhook, _ := strconv.ParseUint(arg.WebhookId, 10, 64)
-	webhook := snowflake.Snowflake(uintWebhook)
-	intConfidence, _ := strconv.ParseFloat(arg.MinConfidence, 10)
 	var ConfidenceMapList []map[string]float64
 
 	if _, err := os.Stat(arg.File); os.IsNotExist(err) {
-		log.Infof("File %s NOT found!", arg.File)
-		log.Panic(err)
+		log.Panicf("File %s NOT found!", arg.File)
 	}
 
 	byteImage, err := ioutil.ReadFile(arg.File)
 	if err != nil {
-		log.Infof("Byte conversion failed!")
-		log.Panic(err)
+		log.Panicf("Byte conversion failed!")
 	}
 
-
-	err, result := DetectImage(byteImage, 40)
+	err, result := DetectImage(byteImage, minConfidence)
 	if err != nil {
-		log.Infof("Failed to detect image")
-		log.Panic(err)
+		log.Panicf("Failed to detect image")
 	}
-
 
 	for _, v := range result.Detections {
-		if v.Confidence >= intConfidence {
+		if v.Confidence >= minConfidence {
 			itemMap := map[string]float64{
 				v.Label: v.Confidence,
 			}
@@ -78,6 +73,5 @@ func main() {
 		}
 	}
 
-	webhooks.NotifyDiscord(webhook, arg.DiscordToken, byteImage, "alert.jpg", arg.MinConfidence, ConfidenceMapList)
+	webhooks.NotifyDiscord(webhook, arg.DiscordToken, byteImage, "alert.jpg", minConfidence, ConfidenceMapList)
 }
-

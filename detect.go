@@ -9,26 +9,25 @@ import (
 	"net/http"
 )
 
-
 type RequestData struct {
 	DetectorName string `json:"detector_name"`
 	Data         string `json:"data"`
 	File         string `json:"file"`
 	Detect       struct {
-		Person     int64 `json:"person"`
-		Cat        int64 `json:"cat"`
-		Bicycle    int64 `json:"bicycle"`
-		Car        int64 `json:"car"`
-		Motorcycle int64 `json:"motorcycle"`
-		Truck      int64 `json:"truck"`
-		Bird       int64 `json:"bird"`
-		Dog        int64 `json:"dog"`
-		Horse      int64 `json:"horse"`
-		cow        int64 `json:"cow"`
-		elephant   int64 `json:"elephant"`
-		bear       int64 `json:"bear"`
-		umbrella   int64 `json:"umbrella"`
-		handbag    int64 `json:"handbag"`
+		Person     float64 `json:"person"`
+		Cat        float64 `json:"cat"`
+		Bicycle    float64 `json:"bicycle"`
+		Car        float64 `json:"car"`
+		Motorcycle float64 `json:"motorcycle"`
+		Truck      float64 `json:"truck"`
+		Bird       float64 `json:"bird"`
+		Dog        float64 `json:"dog"`
+		Horse      float64 `json:"horse"`
+		cow        float64 `json:"cow"`
+		elephant   float64 `json:"elephant"`
+		bear       float64 `json:"bear"`
+		umbrella   float64 `json:"umbrella"`
+		handbag    float64 `json:"handbag"`
 	} `json:"detect"`
 }
 
@@ -49,7 +48,7 @@ func NewRequestData() *RequestData {
 	return &RequestData{}
 }
 
-func (c *RequestData) SetdetectOption(val int64) {
+func (c *RequestData) SetdetectOption(val float64) {
 	c.Detect.Person = val
 	c.Detect.Cat = val
 	c.Detect.Bicycle = val
@@ -70,14 +69,13 @@ func (c *RequestData) Setdetector_name(val string) {
 	c.DetectorName = val
 }
 
-func (c *RequestData) SetFiledata(val []byte)  {
+func (c *RequestData) SetFiledata(val []byte) {
 	encoded := base64.StdEncoding.EncodeToString(val)
 	c.Data = encoded
 }
 
-
 //func DetectImage(imageFile string, minProb int64, wg *sync.WaitGroup) (error, ResponseData ) {
-func DetectImage(imageFile []byte, minProb int64) (error, ResponseData) {
+func DetectImage(imageFile []byte, minProb float64) (error, ResponseData) {
 	var ret ResponseData
 	con := NewRequestData()
 	con.SetFiledata(imageFile)
@@ -92,7 +90,7 @@ func DetectImage(imageFile []byte, minProb int64) (error, ResponseData) {
 
 	responseBody := bytes.NewBuffer(prettyJSON)
 
-	resp, err := http.Post("http://" + arg.DoodsServer + "/detect", "application/json", responseBody)
+	resp, err := http.Post("http://"+arg.DoodsServer+"/detect", "application/json", responseBody)
 	if err != nil {
 		log.Panic(err)
 	}

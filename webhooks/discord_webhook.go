@@ -37,23 +37,23 @@ func (h *HookMatter) SetHookMatterImageName(val string) {
 }
 
 func outFormat(clist []map[string]float64) string {
-	var ret_string string
+	var retString string
 	for _, v := range clist {
 		for d, r := range v {
 			ret := fmt.Sprintf("Detected object %s with %f probablity.\n", d, r)
-			ret_string = strings.Join([]string{ret_string, ret}, " ")
+			retString = strings.Join([]string{retString, ret}, " ")
 		}
 
 	}
-	return ret_string
+	return retString
 }
 
-func NotifyDiscord(webhookName snowflake.Snowflake, WebHookToken string, imageFile []byte, imagename string, minConfidence string, confidenceList []map[string]float64) {
+func NotifyDiscord(webhookName snowflake.Snowflake, WebHookToken string, imageFile []byte, imagename string, minConfidence float64, confidenceList []map[string]float64) {
 
 	desc := outFormat(confidenceList)
 	imageFileIO := bytes.NewReader(imageFile)
 	hook := NewHookMatter()
-	hook.SetHookMatterTitle(fmt.Sprintf("Objects with minimum %s %% probability found.", minConfidence))
+	hook.SetHookMatterTitle(fmt.Sprintf("Objects with minimum %f%% probability found.", minConfidence))
 	hook.SetHookMatterDescription(fmt.Sprintln(desc))
 	hook.SetHookMatterImageFile(imageFileIO)
 	hook.SetHookMatterImageName(imagename)
@@ -78,8 +78,8 @@ func NotifyDiscord(webhookName snowflake.Snowflake, WebHookToken string, imageFi
 			log.Panic(err)
 		}
 		imageId := fmt.Sprint(msg.ID)
-		log.Infof("Image id: %s with minimum %s%% probability found", imageId, minConfidence)
-	}else {
-		log.Errorf("No object with minimum %s%% probability found", minConfidence)
+		log.Infof("Image id: %s with minimum %f%% probability found", imageId, minConfidence)
+	} else {
+		log.Infof("No object with minimum %f%% probability found", minConfidence)
 	}
 }
