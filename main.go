@@ -53,12 +53,13 @@ func main() {
 		log.Panicf("Minimum confidence should between 0-100, got %f", minConfidence)
 	}
 	shinobiExporterUrl := fmt.Sprintf("http://%s/hit",arg.ShinobiExporter)
-	var jsonStr = []byte(fmt.Sprintf(`{"title": %s}`, arg.CameraId))
+	var jsonStr = []byte(fmt.Sprintf(`{"title": "%s"}`, arg.CameraId))
 	req, err := http.NewRequest("GET", shinobiExporterUrl, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	log.Infof("Sending hit to exporter %s", shinobiExporterUrl)
+	log.Infof("Sending data %b", jsonStr)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Panicf("Error sending exporter request %s ",err)
@@ -66,7 +67,7 @@ func main() {
 	if resp.StatusCode == 200 {
 		log.Infof("Hit succesfully sent")
 	} else {
-		log.Warnf("exporter returned %s",resp.StatusCode)
+		log.Warnf("exporter returned %v",resp.StatusCode)
 	}
 	defer resp.Body.Close()
 
