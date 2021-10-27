@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/andersfylling/snowflake"
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
 	"github.com/vibin18/doods_client/webhooks"
 	"io/ioutil"
+	"net/http"
 	"os"
 )
 
@@ -16,6 +18,8 @@ type opts struct {
 	DiscordToken  string  `           long:"token"      env:"DISCORD_TOKEN"  description:"Discord Webhook token"`
 	WebhookId     uint64  `           long:"webhook"      env:"DISCORD_WEBHOOK_ID"  description:"Discord Webhook ID"`
 	MinConfidence float64 `           long:"mincon"      env:"MINIMUM_CONFIDENCE"  description:"Minimum confidence level and Max is 100" default:"50"`
+	CameraId 	  string `            long:"camera"      env:"CAMERA_NAME"  description:"Name of the camera"`
+	ShinobiExporter   string  `       long:"exporter"      env:"SHINOBI_EXPORTER"  description:"Server name or IP of shinobi_exporter and port number" default:"192.168.4.5:8880"`
 }
 
 var (
@@ -39,6 +43,7 @@ func initArgparser() {
 	}
 }
 
+
 func main() {
 
 	initArgparser()
@@ -47,6 +52,17 @@ func main() {
 	if !(minConfidence >= 0 && minConfidence <= 100) {
 		log.Panicf("Minimum confidence should between 0-100, got %f", minConfidence)
 	}
+	shinobiExporterUrl := fmt.Sprintf("http://%s/hit",arg.ShinobiExporter)
+	var jsonStr = []byte(fmt.Sprintf(`{"title": %s}`, arg.CameraId))
+	req, err := http.NewRequest("GET", shinobiExporterUrl, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Panicf("Error sending exporter request %s ",err)
+	}
+	defer resp.Body.Close()
 
 	var ConfidenceMapList []map[string]float64
 
@@ -72,6 +88,7 @@ func main() {
 			ConfidenceMapList = append(ConfidenceMapList, itemMap)
 		}
 	}
+
 
 	webhooks.NotifyDiscord(webhook, arg.DiscordToken, byteImage, "alert.jpg", minConfidence, ConfidenceMapList)
 }
