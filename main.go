@@ -58,9 +58,13 @@ func main() {
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
+	log.Infof("Sending hit to exporter %s", arg.ShinobiExporter)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Panicf("Error sending exporter request %s ",err)
+	}
+	if resp.StatusCode == 200 {
+		log.Infof("Hit succesfully sent")
 	}
 	defer resp.Body.Close()
 
